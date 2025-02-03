@@ -66,8 +66,6 @@ mod organisations_test {
 
     use super::*;
 
-    // DELETE Method isn't tested as to not bother other hackathon participants
-
     // the #[ignore] are here because the temporary free api token isn't valid anymore
 
     #[test]

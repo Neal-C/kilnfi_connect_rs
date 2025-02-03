@@ -148,8 +148,6 @@ mod defi_test {
 
     use super::*;
 
-    // DELETE Method isn't tested as to not bother other hackathon participants
-
     // the #[ignore] are here because the temporary free api token isn't valid anymore
 
     // 422 responses
@@ -202,7 +200,7 @@ mod defi_test {
     }
     // 422 responses
     #[test]
-	#[ignore]
+    #[ignore]
     fn network_stats() {
         let api_token: String = std::env::var("KILN_API_TOKEN")
             .expect("KILN_API_TOKEN is not set in the environment. It is required.");
