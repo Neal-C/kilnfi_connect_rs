@@ -15,5 +15,5 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       - name: test
         env:
-          API_TOKEN: ${{ secrets.KILN_API_TOKEN }}
+          KILN_API_TOKEN: ${{ secrets.KILN_API_TOKEN }}
         run: cargo test

@@ -182,10 +182,13 @@ mod accounts_test {
 
     // DELETE Method isn't tested as to not bother other hackathon participants
 
+    // the #[ignore] are here because the temporary free api token isn't valid anymore
+
     #[test]
+    #[ignore]
     fn account_get_by_uuid() {
-        let api_token: String = std::env::var("API_TOKEN")
-            .expect("API_TOKEN is not set in the environment. It is required.");
+        let api_token: String = std::env::var("KILN_API_TOKEN")
+            .expect("KILN_API_TOKEN is not set in the environment. It is required.");
 
         let kiln: Kiln = Kiln::builder()
             .api_token(api_token)
@@ -203,9 +206,10 @@ mod accounts_test {
     }
 
     #[test]
+    #[ignore]
     fn account_get_all() {
-        let api_token: String = std::env::var("API_TOKEN")
-            .expect("API_TOKEN is not set in the environment. It is required.");
+        let api_token: String = std::env::var("KILN_API_TOKEN")
+            .expect("KILN_API_TOKEN is not set in the environment. It is required.");
 
         let kiln: Kiln = Kiln::builder()
             .api_token(api_token)
@@ -221,9 +225,10 @@ mod accounts_test {
     }
 
     #[test]
+    #[ignore]
     fn account_put() {
-        let api_token: String = std::env::var("API_TOKEN")
-            .expect("API_TOKEN is not set in the environment. It is required.");
+        let api_token: String = std::env::var("KILN_API_TOKEN")
+            .expect("KILN_API_TOKEN is not set in the environment. It is required.");
 
         let kiln: Kiln = Kiln::builder()
             .api_token(api_token)
@@ -241,9 +246,10 @@ mod accounts_test {
     }
 
     #[test]
+    #[ignore]
     fn account_post() {
-        let api_token: String = std::env::var("API_TOKEN")
-            .expect("API_TOKEN is not set in the environment. It is required.");
+        let api_token: String = std::env::var("KILN_API_TOKEN")
+            .expect("KILN_API_TOKEN is not set in the environment. It is required.");
 
         let kiln: Kiln = Kiln::builder()
             .api_token(api_token)
@@ -262,8 +268,8 @@ mod accounts_test {
     #[test]
     #[ignore]
     fn account_portofolio() {
-        let api_token: String = std::env::var("API_TOKEN")
-            .expect("API_TOKEN is not set in the environment. It is required.");
+        let api_token: String = std::env::var("KILN_API_TOKEN")
+            .expect("KILN_API_TOKEN is not set in the environment. It is required.");
 
         let kiln: Kiln = Kiln::builder()
             .api_token(api_token)
@@ -284,8 +290,8 @@ mod accounts_test {
     #[test]
     #[ignore]
     fn account_reports() {
-        let api_token: String = std::env::var("API_TOKEN")
-            .expect("API_TOKEN is not set in the environment. It is required.");
+        let api_token: String = std::env::var("KILN_API_TOKEN")
+            .expect("KILN_API_TOKEN is not set in the environment. It is required.");
 
         let kiln: Kiln = Kiln::builder()
             .api_token(api_token)

@@ -13,6 +13,12 @@ You can install the Rust SDK with cargo:
 cargo add kilnfi_connect_rs
 ```
 
+you may need to use the uuid crate
+
+```shell
+cargo add uuid --features v4,serde
+```
+
 ## Requirements
 
 - a kiln api token. Please contact support@kiln.fi to get one.
@@ -24,13 +30,13 @@ use kilnfi_connect_rs::Kiln;
 use std::str::FromStr;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let api_token: String = std::env::var("API_TOKEN")
-        .expect("API_TOKEN is not set in the environment. It is required.");
+    let api_token: String = std::env::var("KILN_API_TOKEN")
+        .expect("KILN_API_TOKEN is not set in the environment. It is required.");
 
     let kiln: Kiln = Kiln::builder()
         .api_token(api_token)
         // no trailing slash, or else it will break
-        .base_url(String::from("https://api.kiln.fi/v1"))
+        .base_url("https://api.kiln.fi/v1")
         .seal()
         .build()?;
 
