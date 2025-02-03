@@ -160,7 +160,7 @@ mod defi_test {
         let kiln: Kiln = Kiln::builder()
             .api_token(api_token)
             // no trailing slash, or else it will break
-            .base_url(String::from("https://api.kiln.fi/v1"))
+            .base_url("https://api.kiln.fi/v1")
             .seal()
             .build()
             .unwrap();
@@ -189,7 +189,7 @@ mod defi_test {
         let kiln: Kiln = Kiln::builder()
             .api_token(api_token)
             // no trailing slash, or else it will break
-            .base_url(String::from("https://api.kiln.fi/v1"))
+            .base_url("https://api.kiln.fi/v1")
             .seal()
             .build()
             .unwrap();
@@ -208,7 +208,7 @@ mod defi_test {
         let kiln: Kiln = Kiln::builder()
             .api_token(api_token)
             // no trailing slash, or else it will break
-            .base_url(String::from("https://api.kiln.fi/v1"))
+            .base_url("https://api.kiln.fi/v1")
             .seal()
             .build()
             .unwrap();

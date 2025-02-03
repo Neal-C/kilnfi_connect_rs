@@ -89,7 +89,7 @@ impl<BU, T> KilnBuilder<BU, T, NotSealed> {
         }
     }
 
-    pub fn base_url(self, base_url: impl Into<String>) -> KilnBuilder<BaseUrl, T, NotSealed> {
+    pub fn base_url(self, base_url: &str) -> KilnBuilder<BaseUrl, T, NotSealed> {
         KilnBuilder {
             base_url: BaseUrl(base_url.into()),
             api_token: self.api_token,
