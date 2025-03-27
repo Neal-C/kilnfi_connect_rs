@@ -1,6 +1,6 @@
 use std::io::Read;
 
-use crate::{returned_data::ReturnedData, Kiln};
+use crate::{response_format::ReturnedData, Kiln};
 
 use super::Portofolio;
 
@@ -10,8 +10,8 @@ pub struct KilnOrganisationClient {
     base_url: String,
 }
 
-impl KilnOrganisationClient {
-    pub fn new(kiln: &Kiln) -> Self {
+impl From<&Kiln> for KilnOrganisationClient {
+    fn from(kiln: &Kiln) -> Self {
         let url: String = format!("{}/organisations", kiln.base_url);
         let bearer_token: String = format!("Bearer {}", kiln.api_token);
 
@@ -20,8 +20,10 @@ impl KilnOrganisationClient {
             base_url: url,
         }
     }
+}
 
-    pub fn get_by_uuid(&self, id: uuid::Uuid) -> ReturnedData<Portofolio> {
+impl KilnOrganisationClient {
+    pub fn get_by_uuid(&self, id: uuid::Uuid) -> Result<ReturnedData<Portofolio>, ureq::Error> {
         let id_param = id.to_string();
 
         let url: String = format!("{}/{}", self.base_url, id_param);
@@ -29,16 +31,14 @@ impl KilnOrganisationClient {
         let data = ureq::get(url)
             .header("accept", "application/json; charset=utf-8")
             .header("Authorization", &self.bearer_token)
-            .call()
-            .unwrap()
+            .call()?
             .body_mut()
-            .read_json::<ReturnedData<Portofolio>>()
-            .unwrap();
+            .read_json::<ReturnedData<Portofolio>>();
 
         data
     }
 
-    pub fn reports(&self, id: uuid::Uuid) -> Vec<u8> {
+    pub fn get_reports(&self, id: uuid::Uuid) -> Result<Vec<u8>, ureq::Error> {
         let id_param: String = id.to_string();
 
         let url: String = format!("{}/{}/reports", self.base_url, id_param);
@@ -48,14 +48,12 @@ impl KilnOrganisationClient {
         ureq::get(url)
             .header("accept", "application/octet-stream")
             .header("Authorization", &self.bearer_token)
-            .call()
-            .unwrap()
+            .call()?
             .body_mut()
             .as_reader()
-            .read_to_end(&mut file_bytes)
-            .unwrap();
+            .read_to_end(&mut file_bytes)?;
 
-        file_bytes
+        Ok(file_bytes)
     }
 }
 
@@ -84,7 +82,7 @@ mod organisations_test {
 
         let uuid = uuid::Uuid::from_str("9e1c62a4-2b01-4cd8-a2a4-74c57dcd2be4").unwrap();
 
-        let data = kiln.organisations().get_by_uuid(uuid);
+        let data = kiln.organisations().get_by_uuid(uuid).unwrap();
 
         dbg!(data);
     }

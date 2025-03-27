@@ -1,88 +1,14 @@
-use serde::{Deserialize, Serialize};
-use strum_macros::AsRefStr;
+use crate::{response_format::ReturnedData, Kiln};
 
-use crate::{returned_data::ReturnedData, Kiln};
+use super::{NetworkStats, Operations, Stakes};
 
-#[derive(Deserialize, Serialize, AsRefStr, Debug, Clone)]
-#[non_exhaustive]
-pub enum DefiProtocol {
-    AaveV3,
-    Venus,
-    CompoundV3,
-    Morpho,
-    Sdai,
-}
-
-#[derive(Deserialize, Serialize, AsRefStr, Debug, Clone)]
-#[non_exhaustive]
-pub enum Operation {
-    Deposit,
-    Withdrawal,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct NetworkStats {
-    asset: String,
-    asset_icon: String,
-    asset_symbol: String,
-    asset_decimals: String,
-    assets_price_usd: String,
-    share_symbol: String,
-    tvl: String,
-    protocol: String,
-    protocol_display_name: String,
-    protocol_icon: String,
-    protocol_tvl: String,
-    protocol_supply_limit: String,
-    // Gross Reward Rate
-    grr: u64,
-    // Net Reward Rate
-    nrr: u64,
-    vault: String,
-    chain: String,
-    chain_id: u64,
-    updated_at_block: u64,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct Stakes {
-    // Address
-    owner: String,
-    current_balance: String,
-    total_rewards: String,
-    current_rewards: String,
-    total_deposited_amount: String,
-    total_withdrawn_amount: String,
-    // Address
-    vault: String,
-    chain: String,
-    updated_at_block: u64,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct Operations {
-    // Address
-    #[serde(rename(serialize = "type", deserialize = "type"))]
-    operation_type: Operation,
-    owner: String,
-    assets: String,
-    shares: String,
-    sender: String,
-    // Operation timestamp (RFC3339 format)
-    timestamp: String,
-    tx_hash: String,
-    vault: String,
-    chain: String,
-}
-
-#[derive(Clone, Debug)]
 pub struct KilnDefiClient {
     bearer_token: String,
     base_url: String,
 }
 
-impl KilnDefiClient {
-    pub fn new(kiln: &Kiln) -> Self {
+impl From<&Kiln> for KilnDefiClient {
+    fn from(kiln: &Kiln) -> Self {
         let url: String = format!("{}/defi", kiln.base_url);
         let bearer_token: String = format!("Bearer {}", kiln.api_token);
 
@@ -91,53 +17,55 @@ impl KilnDefiClient {
             base_url: url,
         }
     }
+}
 
-    pub fn stakes(&self, wallets: Vec<String>, vaults: Vec<String>) -> ReturnedData<Vec<Stakes>> {
-        let wallets_query = wallets.join(",");
-        let vaults_query = vaults.join(",");
+impl KilnDefiClient {
+    pub fn stakes(
+        &self,
+        wallets: Vec<String>,
+        vaults: Vec<String>,
+    ) -> Result<ReturnedData<Vec<Stakes>>, ureq::Error> {
+        let wallets = wallets.join(",");
+
+        let vaults = vaults.join(",");
+
         let url: String = format!(
             "{}/stakes?wallets={}&vaults={}",
-            self.base_url, wallets_query, vaults_query
+            self.base_url, wallets, vaults
         );
 
         let data = ureq::get(url)
             .header("accept", "application/json; charset=utf-8")
             .header("Authorization", &self.bearer_token)
-            .call()
-            .unwrap()
+            .call()?
             .body_mut()
-            .read_json::<ReturnedData<Vec<Stakes>>>()
-            .unwrap();
+            .read_json::<ReturnedData<Vec<Stakes>>>();
 
         data
     }
 
-    pub fn operations(&self) -> ReturnedData<Vec<Operations>> {
+    pub fn get_operations(&self) -> Result<ReturnedData<Vec<Operations>>, ureq::Error> {
         let url: String = format!("{}/operations", self.base_url);
 
         let data = ureq::get(url)
             .header("accept", "application/json; charset=utf-8")
             .header("Authorization", &self.bearer_token)
-            .call()
-            .unwrap()
+            .call()?
             .body_mut()
-            .read_json::<ReturnedData<Vec<Operations>>>()
-            .unwrap();
+            .read_json::<ReturnedData<Vec<Operations>>>();
 
         data
     }
 
-    pub fn network_stats(&self) -> ReturnedData<Vec<NetworkStats>> {
+    pub fn network_stats(&self) -> Result<ReturnedData<Vec<NetworkStats>>, ureq::Error> {
         let url: String = format!("{}/network-stats", self.base_url);
 
         let data = ureq::get(url)
             .header("accept", "application/json; charset=utf-8")
             .header("Authorization", &self.bearer_token)
-            .call()
-            .unwrap()
+            .call()?
             .body_mut()
-            .read_json::<ReturnedData<Vec<NetworkStats>>>()
-            .unwrap();
+            .read_json::<ReturnedData<Vec<NetworkStats>>>();
 
         data
     }
@@ -165,16 +93,19 @@ mod defi_test {
             .build()
             .unwrap();
 
-        let data = kiln.defi().stakes(
-            vec![String::from("")],
-            vec![
-                String::from("eth"),
-                String::from("arb"),
-                String::from("bsc"),
-                String::from("matic"),
-                String::from("op"),
-            ],
-        );
+        let data = kiln
+            .defi()
+            .stakes(
+                vec![String::from("")],
+                vec![
+                    String::from("eth"),
+                    String::from("arb"),
+                    String::from("bsc"),
+                    String::from("matic"),
+                    String::from("op"),
+                ],
+            )
+            .unwrap();
 
         dbg!(data);
     }
@@ -194,7 +125,7 @@ mod defi_test {
             .build()
             .unwrap();
 
-        let data = kiln.defi().operations();
+        let data = kiln.defi().get_operations().unwrap();
 
         dbg!(data);
     }
@@ -213,7 +144,7 @@ mod defi_test {
             .build()
             .unwrap();
 
-        let data = kiln.defi().network_stats();
+        let data = kiln.defi().network_stats().unwrap();
 
         dbg!(data);
     }

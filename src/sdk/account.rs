@@ -2,10 +2,10 @@ use std::io::Read;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{returned_data::ReturnedData, Kiln};
-
+use crate::{response_format::ReturnedData, Kiln};
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
+#[serde(rename_all = "snake_case")]
 pub struct Account {
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub id: uuid::Uuid,
@@ -13,14 +13,15 @@ pub struct Account {
     pub description: Option<String>,
 }
 
-
 #[derive(Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
 struct AccountPutRequest {
     name: String,
     description: String,
 }
 
 #[derive(Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
 struct AccountPosttRequest {
     name: String,
     description: String,
@@ -32,8 +33,8 @@ pub struct KilnAccountClient {
     base_url: String,
 }
 
-impl KilnAccountClient {
-    pub fn new(kiln: &Kiln) -> Self {
+impl From<&Kiln> for KilnAccountClient {
+    fn from(kiln: &Kiln) -> Self {
         let url: String = format!("{}/accounts", kiln.base_url);
         let bearer_token: String = format!("Bearer {}", kiln.api_token);
 
@@ -42,8 +43,10 @@ impl KilnAccountClient {
             base_url: url,
         }
     }
+}
 
-    pub fn get_by_uuid(&self, id: uuid::Uuid) -> ReturnedData<Account> {
+impl KilnAccountClient {
+    pub fn get_by_uuid(&self, id: uuid::Uuid) -> Result<ReturnedData<Account>, ureq::Error> {
         let id_param = id.to_string();
 
         let url: String = format!("{}/{}", self.base_url, id_param);
@@ -51,29 +54,29 @@ impl KilnAccountClient {
         let data = ureq::get(url)
             .header("accept", "application/json; charset=utf-8")
             .header("Authorization", &self.bearer_token)
-            .call()
-            .unwrap()
+            .call()?
             .body_mut()
-            .read_json::<ReturnedData<Account>>()
-            .unwrap();
+            .read_json::<ReturnedData<Account>>();
 
         data
     }
 
-    pub fn get_all(&self) -> ReturnedData<Vec<Account>> {
+    pub fn get_all(&self) -> Result<ReturnedData<Vec<Account>>, ureq::Error> {
         let data = ureq::get(&self.base_url)
             .header("accept", "application/json; charset=utf-8")
             .header("Authorization", &self.bearer_token)
-            .call()
-            .unwrap()
+            .call()?
             .body_mut()
-            .read_json::<ReturnedData<Vec<Account>>>()
-            .unwrap();
+            .read_json::<ReturnedData<Vec<Account>>>();
 
         data
     }
 
-    pub fn post(&self, name: &str, description: &str) -> ReturnedData<Account> {
+    pub fn post(
+        &self,
+        name: &str,
+        description: &str,
+    ) -> Result<ReturnedData<Account>, ureq::Error> {
         let send_body = AccountPosttRequest {
             name: name.into(),
             description: description.into(),
@@ -82,16 +85,19 @@ impl KilnAccountClient {
         let data = ureq::post(&self.base_url)
             .header("accept", "application/json; charset=utf-8")
             .header("Authorization", &self.bearer_token)
-            .send_json(&send_body)
-            .unwrap()
+            .send_json(&send_body)?
             .body_mut()
-            .read_json::<ReturnedData<Account>>()
-            .unwrap();
+            .read_json::<ReturnedData<Account>>();
 
         data
     }
 
-    pub fn put(&self, id: uuid::Uuid, name: &str, description: &str) -> ReturnedData<Account> {
+    pub fn put(
+        &self,
+        id: uuid::Uuid,
+        name: &str,
+        description: &str,
+    ) -> Result<ReturnedData<Account>, ureq::Error> {
         let id_param = id.to_string();
 
         let url: String = format!("{}/{}", self.base_url, id_param);
@@ -104,16 +110,14 @@ impl KilnAccountClient {
         let data = ureq::put(url)
             .header("accept", "application/json; charset=utf-8")
             .header("Authorization", &self.bearer_token)
-            .send_json(&send_body)
-            .unwrap()
+            .send_json(&send_body)?
             .body_mut()
-            .read_json::<ReturnedData<Account>>()
-            .unwrap();
+            .read_json::<ReturnedData<Account>>();
 
         data
     }
 
-    pub fn delete(&self, id: uuid::Uuid) -> ReturnedData<Account> {
+    pub fn delete(&self, id: uuid::Uuid) -> Result<ReturnedData<Account>, ureq::Error> {
         let id_param = id.to_string();
 
         let url: String = format!("{}/{}", self.base_url, id_param);
@@ -121,55 +125,53 @@ impl KilnAccountClient {
         let data = ureq::delete(url)
             .header("accept", "application/json; charset=utf-8")
             .header("Authorization", &self.bearer_token)
-            .call()
-            .unwrap()
+            .call()?
             .body_mut()
-            .read_json::<ReturnedData<Account>>()
-            .unwrap();
+            .read_json::<ReturnedData<Account>>();
 
         data
     }
 
-    pub fn portofolio(&self, id: uuid::Uuid, refresh: bool) -> ReturnedData<Account> {
+    pub fn portofolio(
+        &self,
+        id: uuid::Uuid,
+        refresh: bool,
+    ) -> Result<ReturnedData<Account>, ureq::Error> {
         let id_param: String = id.to_string();
 
-        let refresh_query_string: String = refresh.to_string();
+        let refresh: String = refresh.to_string();
 
         let url: String = format!(
             "{}/{}/portofolio?refresh={}",
-            self.base_url, id_param, refresh_query_string
+            self.base_url, id_param, refresh
         );
 
         let data = ureq::get(url)
             .header("accept", "application/json; charset=utf-8")
             .header("Authorization", &self.bearer_token)
-            .call()
-            .unwrap()
+            .call()?
             .body_mut()
-            .read_json::<ReturnedData<Account>>()
-            .unwrap();
+            .read_json::<ReturnedData<Account>>();
 
         data
     }
 
-    pub fn reports(&self, id: uuid::Uuid) -> Vec<u8> {
-        let id_param: String = id.to_string();
+    pub fn get_reports(&self, id: uuid::Uuid) -> Result<Vec<u8>, ureq::Error> {
+        let id: String = id.to_string();
 
-        let url: String = format!("{}/{}/reports", self.base_url, id_param);
+        let url: String = format!("{}/{}/reports", self.base_url, id);
 
         let mut file_bytes: Vec<u8> = Vec::new();
 
         ureq::get(url)
             .header("accept", "application/octet-stream")
             .header("Authorization", &self.bearer_token)
-            .call()
-            .unwrap()
+            .call()?
             .body_mut()
             .as_reader()
-            .read_to_end(&mut file_bytes)
-            .unwrap();
+            .read_to_end(&mut file_bytes)?;
 
-        file_bytes
+        Ok(file_bytes)
     }
 }
 
@@ -179,7 +181,6 @@ mod accounts_test {
     use std::str::FromStr;
 
     use super::*;
-
 
     // the #[ignore] are here because the temporary free api token isn't valid anymore
 
@@ -199,7 +200,7 @@ mod accounts_test {
 
         let uuid = uuid::Uuid::from_str("9e1c62a4-2b01-4cd8-a2a4-74c57dcd2be4").unwrap();
 
-        let data = kiln.accounts().get_by_uuid(uuid);
+        let data = kiln.accounts().get_by_uuid(uuid).unwrap();
 
         dbg!(data);
     }
@@ -218,7 +219,7 @@ mod accounts_test {
             .build()
             .unwrap();
 
-        let data = kiln.accounts().get_all();
+        let data = kiln.accounts().get_all().unwrap();
 
         dbg!(data);
     }
@@ -239,7 +240,7 @@ mod accounts_test {
 
         let uuid = uuid::Uuid::from_str("9e1c62a4-2b01-4cd8-a2a4-74c57dcd2be4").unwrap();
 
-        let data = kiln.accounts().put(uuid, "John", "John John");
+        let data = kiln.accounts().put(uuid, "John", "John John").unwrap();
 
         dbg!(data);
     }
@@ -258,7 +259,7 @@ mod accounts_test {
             .build()
             .unwrap();
 
-        let data = kiln.accounts().post("Tanjiro", "Kamado");
+        let data = kiln.accounts().post("Tanjiro", "Kamado").unwrap();
 
         dbg!(data);
     }
@@ -280,7 +281,7 @@ mod accounts_test {
 
         let uuid = uuid::Uuid::from_str("9e1c62a4-2b01-4cd8-a2a4-74c57dcd2be4").unwrap();
 
-        let data = kiln.accounts().portofolio(uuid, false);
+        let data = kiln.accounts().portofolio(uuid, false).unwrap();
 
         dbg!(data);
     }
@@ -302,7 +303,7 @@ mod accounts_test {
 
         let uuid = uuid::Uuid::from_str("9e1c62a4-2b01-4cd8-a2a4-74c57dcd2be4").unwrap();
 
-        let data = kiln.accounts().reports(uuid);
+        let data = kiln.accounts().get_reports(uuid).unwrap();
 
         dbg!(data);
     }

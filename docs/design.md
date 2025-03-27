@@ -12,14 +12,10 @@ An invalid Kiln connect client cannot be built.
 
 It's a sync , blocking client.
 
-### Async
-
-Async client incoming.
-
 ## Error Handling
 
-The .unwrap() calls are for prototyping and testing.
-I swear, they'll be gone with time. trust me bro.
+This is a #unwrapFree certified crate !
+All errors are transparently returned for the ureq crate.
 
 ## Decimal Precision
 
@@ -36,4 +32,5 @@ Therefore, the recommended Rust type is decimal::Decimal.
 
 ## Typing
 
-Enums and Addresses will be added
+Address types could be added
+PublicKey types could be added
