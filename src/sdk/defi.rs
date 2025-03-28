@@ -20,7 +20,7 @@ impl From<&Kiln> for KilnDefiClient {
 }
 
 impl KilnDefiClient {
-    pub fn stakes(
+    pub fn get_stakes(
         &self,
         wallets: Vec<String>,
         vaults: Vec<String>,
@@ -57,7 +57,7 @@ impl KilnDefiClient {
         data
     }
 
-    pub fn network_stats(&self) -> Result<ReturnedData<Vec<NetworkStats>>, ureq::Error> {
+    pub fn get_network_stats(&self) -> Result<ReturnedData<Vec<NetworkStats>>, ureq::Error> {
         let url: String = format!("{}/network-stats", self.base_url);
 
         let data = ureq::get(url)
@@ -95,7 +95,7 @@ mod defi_test {
 
         let data = kiln
             .defi()
-            .stakes(
+            .get_stakes(
                 vec![String::from("")],
                 vec![
                     String::from("eth"),
@@ -144,7 +144,7 @@ mod defi_test {
             .build()
             .unwrap();
 
-        let data = kiln.defi().network_stats().unwrap();
+        let data = kiln.defi().get_network_stats().unwrap();
 
         dbg!(data);
     }

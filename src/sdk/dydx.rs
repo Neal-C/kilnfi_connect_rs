@@ -13,14 +13,6 @@ use super::{
     WithdrawRewardsTxRequest,
 };
 
-// #[derive(Serialize, Deserialize, Debug)]
-// #[serde(rename_all = "snake_case")]
-// pub struct DydxGetStakesRequest {
-//     pub delegators: Vec<String>,
-//     pub validators: Vec<String>,
-//     pub accounts: Vec<Uuid>,
-// }
-
 #[derive(Serialize, Deserialize, Debug)]
 pub enum DydxStakeState {
     Active,
@@ -79,19 +71,6 @@ pub struct DydxGetStakesResponse {
     pub permissions: Vec<DydxGetStakesResponsePermission>,
     pub unbondings: Vec<DydxGetStakesResponseUnbonding>,
 }
-
-// #[derive(Serialize, Deserialize, Debug)]
-// #[serde(rename_all = "snake_case")]
-// pub struct DydxCreateStakeRequestStake {
-//     pub stake_id: String,
-// }
-
-// #[derive(Serialize, Deserialize, Debug)]
-// #[serde(rename_all = "snake_case")]
-// pub struct DydxCreateStakeRequest {
-//     pub stakes: Vec<DydxCreateStakeRequestStake>,
-//     pub account_id: Uuid,
-// }
 
 #[derive(Serialize, Deserialize, EnumString, Debug)]
 pub enum DydxStakeStatus {

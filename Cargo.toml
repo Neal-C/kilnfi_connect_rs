@@ -1,6 +1,6 @@
 [package]
 name = "kilnfi_connect_rs"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 readme = "README.md"
 homepage = "https://github.com/Neal-C/kilnfi_connect_rs"

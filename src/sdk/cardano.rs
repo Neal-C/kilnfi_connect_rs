@@ -26,6 +26,17 @@ pub struct CardanoCert {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "snake_case")]
+pub struct CardanoGetStakesRequest {
+    pub wallets: Vec<String>,
+    pub vaults: Vec<String>,
+    pub pool_ids: Vec<String>,
+    pub accounts: Vec<Uuid>,
+    pub current_page: Option<u64>,
+    pub page_size: Option<u64>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "snake_case")]
 pub struct CardanoNetworkStats {
     pub ada_price_usd: f64,
     pub nb_validators: u64,
@@ -208,13 +219,17 @@ impl From<&Kiln> for KilnCardanoClient {
 impl KilnCardanoClient {
     pub fn get_stakes(
         &self,
-        wallets: Vec<String>,
-        vaults: Vec<String>,
-        pool_ids: Vec<String>,
-        accounts: Vec<Uuid>,
-        current_page: Option<u64>,
-        page_size: Option<u64>,
+        get_stakes_request: &CardanoGetStakesRequest,
     ) -> Result<ReturnedData<Vec<ChainStakes>>, ureq::Error> {
+        let CardanoGetStakesRequest {
+            wallets,
+            vaults,
+            pool_ids,
+            accounts,
+            current_page,
+            page_size,
+        } = get_stakes_request;
+
         let wallets = wallets.join(",");
 
         let vaults = vaults.join(",");
@@ -246,31 +261,8 @@ impl KilnCardanoClient {
         data
     }
 
-    pub fn get_network_stats(
-        &self,
-        reports_request: &CardanoReportsRequest,
-    ) -> Result<ReturnedData<CardanoNetworkStats>, ureq::Error> {
-        let CardanoReportsRequest {
-            stake_addresses,
-            wallets,
-            accounts,
-            format,
-        } = reports_request;
-
-        let stake_addresses = stake_addresses.join(",");
-
-        let wallets = wallets.join(",");
-
-        let accounts = accounts.join(",");
-
-        let url: String = format!(
-            "{}/network-stats?stake_addresses={}&wallets={}&accounts={}&format={}",
-            self.base_url,
-            stake_addresses,
-            wallets,
-            accounts,
-            format.as_ref()
-        );
+    pub fn get_network_stats(&self) -> Result<ReturnedData<CardanoNetworkStats>, ureq::Error> {
+        let url: String = format!("{}/network-stats", self.base_url);
 
         let data = ureq::get(url)
             .header("accept", "application/json; charset=utf-8")
@@ -323,7 +315,7 @@ impl KilnCardanoClient {
 
     pub fn get_reports(
         &self,
-        reports_request: CardanoReportsRequest,
+        reports_request: &CardanoReportsRequest,
     ) -> Result<Vec<u8>, ureq::Error> {
         let CardanoReportsRequest {
             stake_addresses,

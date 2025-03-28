@@ -12,7 +12,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build()
         .unwrap();
 
-    let _data = kiln.defi().network_stats();
+    let _data = kiln.defi().get_network_stats();
 
     Ok(())
 }
