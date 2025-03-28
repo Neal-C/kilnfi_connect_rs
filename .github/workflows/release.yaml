@@ -23,7 +23,7 @@ jobs:
       - name: 'Install Rust toolchain'
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: 'stable 12 months'
+          toolchain: 'stable 12 months ago'
       - name: 'release'
         if: contains(github.ref, '-') == false
         env:
