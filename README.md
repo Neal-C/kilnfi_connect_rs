@@ -71,7 +71,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-Find complete examples in the `examples` directory and the documentation website https://connect-rs-docs.vercel.app/docs/connect_rs/accounts.
+Find more examples in the `examples` directory and the complete examples on the documentation website https://connect-rs-docs.vercel.app/docs/connect_rs/accounts.
 
 ## Contributing
 
