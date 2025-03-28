@@ -10,7 +10,7 @@ keywords = ["kiln", "kilnfi", "sdk", "staking"]
 categories = ["api-bindings", "web-programming"]
 authors = ["Neal-C <knoll-clear-gout@duck.com>"]
 repository = "https://github.com/Neal-C/kilnfi_connect_rs.git"
-rust-version = "1.84.1"
+rust-version = "1.85.1"
 
 [dependencies]
 ureq = {version = "3.0.10", features = ["json"]}

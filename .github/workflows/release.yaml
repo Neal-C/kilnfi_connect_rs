@@ -21,7 +21,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: 'Install Rust toolchain'
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: 'stable 12 months ago'
       - name: 'release'

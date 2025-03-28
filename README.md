@@ -18,7 +18,9 @@ Developed on a strict no-unwrap policy.
 https://connect-rs-docs.vercel.app/docs/connect_rs/
 
 ### Kiln documentation
+
 Kiln documentation : https://docs.api.kiln.fi/docs/quickstart
+
 Kiln API reference documentation : https://docs.api.kiln.fi/reference/getaccounts
 
 ## Requirements
